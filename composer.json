@@ -13,16 +13,24 @@
     ],
     "autoload": {
         "psr-4": {
-            "Driade\\Anabel\\": "src/"
+            "Driade\\Anabel\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Driade\\Anabel\\\\Test\\": "tests"
         }
     },
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3",
         "composer/composer": "^1.4",
-        "symfony/console": "~3.2",
         "twig/twig": "^1.33"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8.22"
+        "phpunit/phpunit": "^4.8.22",
+        "mockery/mockery": "^0.9.9"
+    },
+    "scripts": {
+        "test": "cd tests/example3/; ../../vendor/bin/composer install; cd ../../; vendor/bin/phpunit"
     }
 }

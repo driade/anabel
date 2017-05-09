@@ -28,7 +28,7 @@
         }
         .warning {
             background-color:#ffa500;
-            color:#fff;
+            color:#000;
             font-weight:500;
         }
     </style>

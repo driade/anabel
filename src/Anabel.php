@@ -3,24 +3,26 @@
 namespace Driade\Anabel;
 
 use Composer\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
 
 class Anabel
 {
-    protected $packages = [];
-    protected $config   = [
+    public $packages = array();
+    public $config   = array(
         'all'             => false,
         'composer_dir'    => '.',
-        'templates_dir'   => __DIR__ . '/views',
+        'templates_dir'   => '',
         'template_header' => 'header.twig.php',
         'template_body'   => 'body.twig.php',
         'template_footer' => 'footer.twig.php',
         'sort'            => true,
-    ];
+    );
+
+    public function __construct()
+    {
+        $this->config['templates_dir'] = __DIR__ . '/views';
+    }
 
     public function outdated()
     {
@@ -34,74 +36,20 @@ class Anabel
 
     protected function getOutdated()
     {
-        $options = ['command' => 'outdated', '--format' => 'json'];
+        $outdated = new AnabelOutdated();
+        $outdated->setApp(new Application);
 
-        if ($this->getOption('all')) {
-            $options += ['--all' => '--all']; // FIX
-        }
-
-        chdir($this->getOption('composer_dir'));
-
-        $input = new ArrayInput($options);
-
-        $stream = fopen('php://temp', 'w+');
-        $output = new StreamOutput($stream);
-        $output->setVerbosity(OutputInterface::VERBOSITY_NORMAL);
-
-        $app = new Application;
-        $app->setAutoExit(false);
-        $app->run(new ArrayInput($options), $output);
-
-        rewind($stream);
-
-        $stream = stream_get_contents($stream);
-
-        // FIX
-        $stream = substr($stream, strpos($stream, '{'));
-
-        $packages = json_decode($stream, true);
-
-        if (isset($packages['installed'])) {
-            foreach ($packages['installed'] as $package) {
-                $this->packages[$package['name']] = $package;
-            }
-        }
+        $this->packages = $outdated->handle($this->getOption('all'), $this->getOption('composer_dir'));
 
         return $this;
     }
 
     protected function findExtrainfo()
     {
-        chdir($this->getOption('composer_dir'));
+        $extraInfo = new AnabelExtraInfo;
+        $extraInfo->setApp(new Application);
 
-        $input = new ArrayInput(['command' => 'show', '-P' => '-P', '-f' => 'json']);
-
-        $stream = fopen('php://temp', 'w+');
-
-        $app = new Application;
-        $app->setAutoExit(false);
-        $app->run($input, new StreamOutput($stream));
-
-        rewind($stream);
-
-        $packages = json_decode(stream_get_contents($stream), true);
-
-        if (isset($packages['installed'])) {
-            foreach ($packages['installed'] as $package) {
-
-                if (isset($package['name'], $package['path'], $this->packages[$package['name']])) {
-                    if (file_exists($package['path'] . '/composer.json')) {
-
-                        $composer = file_get_contents($package['path'] . '/composer.json');
-                        $composer = json_decode($composer, true);
-
-                        if (isset($composer['homepage'])) {
-                            $this->packages[$package['name']]['homepage'] = $composer['homepage'];
-                        }
-                    }
-                }
-            }
-        }
+        $this->packages = $extraInfo->handle($this->packages, $this->getOption('composer_dir'));
 
         return $this;
     }
@@ -110,7 +58,7 @@ class Anabel
     {
         if ($this->getOption('sort') === true) {
             uasort($this->packages, function ($a, $b) {
-                return array_search($a['status'], ['semver-safe-update', 'update-possible', 'up-to-date']) > array_search($b['status'], ['semver-safe-update', 'update-possible', 'up-to-date']);
+                return array_search($a['status'], array('semver-safe-update', 'update-possible', 'up-to-date')) > array_search($b['status'], array('semver-safe-update', 'update-possible', 'up-to-date'));
             });
         }
 
@@ -119,7 +67,7 @@ class Anabel
 
     protected function transformPackages()
     {
-        $packages = [];
+        $packages = array();
 
         foreach ($this->packages as $package) {
 
@@ -129,14 +77,21 @@ class Anabel
                 $homepage = $package['homepage'];
             }
 
-            $packages[] = [
+            $warning = '';
+
+            if (isset($package['warning'])) {
+                $warning = $package['warning'];
+            }
+
+            $packages[] = array(
                 'name'        => $package['name'],
                 'version'     => $package['version'],
                 'latest'      => $package['latest'],
                 'status'      => $package['latest-status'],
                 'description' => $package['description'],
                 'homepage'    => $homepage,
-            ];
+                'warning'     => $warning,
+            );
         }
 
         $this->packages = $packages;
@@ -150,7 +105,7 @@ class Anabel
         $twig   = new Twig_Environment($loader);
 
         $html = $twig->render($this->getOption('template_header'));
-        $html .= $twig->render($this->getOption('template_body'), ['packages' => $this->packages]);
+        $html .= $twig->render($this->getOption('template_body'), array('packages' => $this->packages));
         $html .= $twig->render($this->getOption('template_footer'));
 
         return $html;
@@ -161,7 +116,7 @@ class Anabel
         $this->config = array_merge($this->config, $config);
     }
 
-    protected function getOption($key)
+    public function getOption($key)
     {
         return $this->config[$key];
     }

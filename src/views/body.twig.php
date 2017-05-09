@@ -13,7 +13,7 @@
                         <th nowrap class='text-right'>Version installed</th>
                         <th nowrap class='text-right'>Latest version</th>
                         <th class='text-center'>Status</th>
-                        <th>Description</th>
+                        <th><span class='hidden-xs'>Description</span></th>
                     </thead>
                     <tbody>
                     {% for package in packages %}
@@ -30,11 +30,11 @@
                             <td class='text-center'>
                                 <div class='status status-{{ package.status|e }}'></div>
                             </td>
-                            <td>{{ package.description|e }}</td>
+                            <td><span class='hidden-xs'>{{ package.description|e }}</span></td>
                         </tr>
                         {% if package.warning %}
                             <tr>
-                                <td class='warning'>{{ package.warning|e }}</td>
+                                <td class='warning' colspan='5'>{{ package.warning|e }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}
