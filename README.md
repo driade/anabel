@@ -52,6 +52,10 @@ You can pass an array to setConfig in order to control the behaviour of the pack
 ];
 ```
 
+## Memory issues
+
+This program runs in the browser and calls Composer via API, and it's possible that you have a low memory limit in your php.ini that will make Composer fail.
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information of what has changed recently.
