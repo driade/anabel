@@ -10,7 +10,7 @@ class AnabelTest extends \PHPUnit_Framework_TestCase
 
     public function outdated()
     {
-        $mock = $this->getMock(Anabel::class, array('getOutdated', 'findExtrainfo', 'transformPackages', 'sort'));
+        $mock = $this->getMock('Driade\Anabel\Anabel', array('getOutdated', 'findExtrainfo', 'transformPackages', 'sort'));
 
         $mock->expects($this->once())
             ->method('getOutdated')
