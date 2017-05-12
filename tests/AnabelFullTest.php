@@ -7,9 +7,6 @@ use Driade\Anabel\Anabel;
 class AnabelFullTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
-    /**
-     * @group full
-     */
     public function complete()
     {
         $anabel = new Anabel;
