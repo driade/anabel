@@ -37,7 +37,7 @@ class AnabelOutdatedTest extends \PHPUnit_Framework_TestCase
         $anabel = new AnabelOutdated;
         $this->invoke($anabel, 'parsePackages', array(array('foo')));
 
-        $this->assertEquals(array(), $anabel->packages);
+        $this->assertEquals(array(), $anabel->getPackages());
     }
 
     /** @test */
@@ -53,7 +53,7 @@ class AnabelOutdatedTest extends \PHPUnit_Framework_TestCase
         );
         $this->invoke($anabel, 'parsePackages', array(array('installed' => array(array('name' => 'foo', 'description' => 'acme')))));
 
-        $this->assertEquals($output, $anabel->packages);
+        $this->assertEquals($output, $anabel->getPackages());
     }
 
     public function invoke(&$object, $methodName, array $parameters = array())

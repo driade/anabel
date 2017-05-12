@@ -9,6 +9,9 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class AnabelOutdated
 {
+    private $app;
+    protected $packages = array();
+
     public function setApp(Application $app)
     {
         $this->app = $app;
@@ -46,12 +49,18 @@ class AnabelOutdated
 
     protected function parsePackages($packages)
     {
-        $this->packages = array();
-
-        if (isset($packages['installed'])) {
-            foreach ($packages['installed'] as $package) {
-                $this->packages[$package['name']] = $package;
-            }
+        if ( ! isset($packages['installed'])) {
+            return;
         }
+
+        $this->packages = array_combine(
+            array_column($packages['installed'], 'name'),
+            $packages['installed']
+        );
+    }
+
+    public function getPackages()
+    {
+        return $this->packages;
     }
 }

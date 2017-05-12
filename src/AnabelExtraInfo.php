@@ -8,6 +8,8 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class AnabelExtraInfo
 {
+    private $app;
+
     public function setApp(Application $app)
     {
         $this->app = $app;
@@ -40,23 +42,29 @@ class AnabelExtraInfo
 
     protected function parsePackages($packages)
     {
-        if (isset($packages['installed'])) {
+        if ( ! isset($packages['installed'])) {
+            return;
+        }
 
-            foreach ($packages['installed'] as $package) {
+        foreach ($packages['installed'] as $package) {
 
-                if (isset($package['name'], $package['path'], $this->packages[$package['name']])) {
-
-                    if (file_exists($package['path'] . '/composer.json')) {
-
-                        $composer = file_get_contents($package['path'] . '/composer.json');
-                        $composer = json_decode($composer, true);
-
-                        if (isset($composer['homepage'])) {
-                            $this->packages[$package['name']]['homepage'] = $composer['homepage'];
-                        }
-                    }
-                }
+            if ( ! isset($package['name'], $package['path'], $this->packages[$package['name']])) {
+                continue;
             }
+
+            if ( ! file_exists($package['path'] . '/composer.json')) {
+                continue;
+            }
+
+            $composer = file_get_contents($package['path'] . '/composer.json');
+            $composer = json_decode($composer, true);
+
+            if (isset($composer['homepage'])) {
+                $this->packages[$package['name']]['homepage'] = $composer['homepage'];
+            }
+
+            unset($composer);
+
         }
     }
 }

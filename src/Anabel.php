@@ -57,8 +57,11 @@ class Anabel
     protected function sort()
     {
         if ($this->getOption('sort') === true) {
-            uasort($this->packages, function ($a, $b) {
-                return array_search($a['status'], array('semver-safe-update', 'update-possible', 'up-to-date')) > array_search($b['status'], array('semver-safe-update', 'update-possible', 'up-to-date'));
+
+            $order = array('semver-safe-update', 'update-possible', 'up-to-date');
+
+            uasort($this->packages, function ($a, $b) use ($order) {
+                return array_search($a['status'], $order) > array_search($b['status'], $order);
             });
         }
 
