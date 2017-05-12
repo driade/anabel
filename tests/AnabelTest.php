@@ -28,7 +28,7 @@ class AnabelTest extends \PHPUnit_Framework_TestCase
             ->method('sort')
             ->will($this->returnValue($mock));
 
-        $this->assertInstanceOf(Anabel::class, $mock->outdated());
+        $this->assertInstanceOf('Driade\Anabel\Anabel', $mock->outdated());
 
         \Mockery::close();
     }
