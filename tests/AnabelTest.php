@@ -7,6 +7,33 @@ use Driade\Anabel\Anabel;
 class AnabelTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
+
+    public function outdated()
+    {
+        $mock = $this->getMock(Anabel::class, array('getOutdated', 'findExtrainfo', 'transformPackages', 'sort'));
+
+        $mock->expects($this->once())
+            ->method('getOutdated')
+            ->will($this->returnValue($mock));
+
+        $mock->expects($this->once())
+            ->method('findExtrainfo')
+            ->will($this->returnValue($mock));
+
+        $mock->expects($this->once())
+            ->method('transformPackages')
+            ->will($this->returnValue($mock));
+
+        $mock->expects($this->once())
+            ->method('sort')
+            ->will($this->returnValue($mock));
+
+        $this->assertInstanceOf(Anabel::class, $mock->outdated());
+
+        \Mockery::close();
+    }
+
+    /** @test */
     public function defaultConfig()
     {
         $anabel = new Anabel;
