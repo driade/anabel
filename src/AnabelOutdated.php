@@ -53,10 +53,9 @@ class AnabelOutdated
             return;
         }
 
-        $this->packages = array_combine(
-            array_column($packages['installed'], 'name'),
-            $packages['installed']
-        );
+        foreach ($packages['installed'] as $package) {
+            $this->packages[$package['name']] = $package;
+        }
     }
 
     public function getPackages()
